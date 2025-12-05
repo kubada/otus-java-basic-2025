@@ -1,6 +1,7 @@
 package ru.otus.java.basic.homeworks.lesson_3;
 
 import java.util.Scanner;
+import java.util.Random;
 
 public class App {
     static void main() {
@@ -12,6 +13,9 @@ public class App {
         asterisk();
     }
 
+    /**
+     * При вызове должен отпечатать в столбец 4 слова: Hello, World, from, Java;
+     */
     public static void greetings() {
         System.out.println("# greetings");
         System.out.println("Hello");
@@ -22,6 +26,15 @@ public class App {
         // System.out.println("Hello\nWorld\nfrom\nJava");
     }
 
+    /**
+     * Принимает 3 int аргумента (a, b и c), считает их сумму, и если она больше или равна 0,
+     * то вывести в консоль сообщение “Сумма положительная”, в противном случае - “Сумма отрицательная”;
+     *
+     * @param a int
+     * @param b int
+     * @param c int
+     *
+     */
     public static void checkSign(int a, int b, int c) {
         System.out.println("\n# checkSign");
 
@@ -36,6 +49,11 @@ public class App {
         }
     }
 
+    /**
+     * В теле объявлена int переменная data с любым значением.
+     * Если data меньше 10 включительно, то в консоль должно быть выведено сообщение “Красный”,
+     * если от 10 до 20 включительно, то “Желтый”, если больше 20 - “Зеленый”;
+     */
     public static void selectColor() {
         System.out.println("\n# selectColor");
 
@@ -45,7 +63,7 @@ public class App {
             System.out.println("Красный");
         }
 
-        if (data > 10 && data <= 20 ) {
+        if (data > 10 && data <= 20) {
             System.out.println("Жёлтый");
         }
 
@@ -54,6 +72,10 @@ public class App {
         }
     }
 
+    /**
+     * В теле объявлено две int переменные (a, b) с любыми значениями.
+     * Если a больше или равно b, то необходимо вывести в консоль сообщение “a >= b”, в противном случае “a < b”;
+     */
     public static void compareNumbers() {
         System.out.println("\n# compareNumbers");
 
@@ -62,27 +84,36 @@ public class App {
 
         if (a >= b) {
             System.out.println("a >= b");
-        }
-
-        else System.out.println("a < b");
+        } else System.out.println("a < b");
     }
 
+    /**
+     * Если increment = true, то (initValue + delta) и вывести результат в консоль, иначе (initValue - delta);
+     *
+     * @param initValue int
+     * @param delta     int
+     * @param increment boolean
+     */
     public static void addOrSubtractAndPrint(int initValue, int delta, boolean increment) {
         System.out.println("\n# addOrSubtractAndPrint");
 
         if (increment == true) {
             System.out.println("increment = true: " + (initValue + delta));
-        }
-
-        else {
+        } else {
             System.out.println("increment = false: " + (initValue - delta));
         }
     }
 
+    /**
+     * Запрашиваем ввод числа от 1 до 5, после ввода выполняем метод,
+     * соответствующий указанному номеру со случайным значением аргументов;
+     */
     public static void asterisk() {
         System.out.println("\n# asterisk");
 
         Scanner scanner = new Scanner(System.in);
+        Random random = new Random();
+
         System.out.print("Введите число: ");
 
         int in = scanner.nextInt();
@@ -92,13 +123,13 @@ public class App {
         if (in == 1) {
             greetings();
         } else if (in == 2) {
-            checkSign(2, 5, -10);
+            checkSign(random.nextInt(), random.nextInt(), random.nextInt());
         } else if (in == 3) {
             selectColor();
         } else if (in == 4) {
             compareNumbers();
         } else if (in == 5) {
-            addOrSubtractAndPrint(4, 7, false);
+            addOrSubtractAndPrint(random.nextInt(), random.nextInt(), random.nextBoolean());
         } else {
             System.out.println("Неверный номер! Введите от 1 до 5.");
         }
