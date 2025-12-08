@@ -85,7 +85,7 @@ public class App {
     }
 
     /**
-     * Если increment = true, то (initValue + delta) и вывести результат в консоль, иначе (initValue - delta);
+     * Если increment = true, то (initValue + delta), иначе (initValue - delta). Вывести результат в консоль;
      *
      * @param initValue int
      * @param delta     int
@@ -96,9 +96,7 @@ public class App {
 
         if (increment) {
             System.out.println("increment = true: " + (initValue + delta));
-        } else {
-            System.out.println("increment = false: " + (initValue - delta));
-        }
+        } else System.out.println("increment = false: " + (initValue - delta));
     }
 
     /**
