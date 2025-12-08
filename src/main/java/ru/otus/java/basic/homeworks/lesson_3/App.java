@@ -43,11 +43,7 @@ public class App {
 
         if (sum >= 0) {
             System.out.println("Сумма положительная");
-        }
-
-        if (sum <= 0) {
-            System.out.println("Сумма отрицательная");
-        }
+        } else System.out.println("Сумма отрицательная");
     }
 
     /**
@@ -113,12 +109,30 @@ public class App {
         System.out.println("\n# asterisk");
 
         Scanner scanner = new Scanner(System.in);
+        int in;
+
         Random random = new Random();
 
-        System.out.print("Введите число: ");
+        while (true) {
+            System.out.print("Введите число от 1 до 5: ");
 
-        int in = scanner.nextInt();
+            // Проверяем, что введено именно число
+            if (scanner.hasNextInt()) {
+                in = scanner.nextInt();
 
+                // Проверяем диапазон
+                if (in >= 1 && in <= 5) {
+                    break; // Корректное число
+                } else {
+                    System.out.println("Неверное число. Допустимо: от 1 до 5.");
+                }
+            } else {
+                System.out.println("Ввод не является числом. Попробуйте ещё раз.");
+                scanner.next(); // Очищаем некорректный ввод
+            }
+        }
+
+        // Это только после break
         System.out.printf("Введённое число: %d \n", in);
 
         if (in == 1) {
@@ -131,8 +145,6 @@ public class App {
             compareNumbers();
         } else if (in == 5) {
             addOrSubtractAndPrint(random.nextInt(), random.nextInt(), random.nextBoolean());
-        } else {
-            System.out.println("Неверный номер! Введите от 1 до 5.");
         }
 
         scanner.close();
