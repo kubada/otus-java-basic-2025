@@ -18,6 +18,7 @@ public class App {
      */
     public static void greetings() {
         System.out.println("# greetings");
+
         System.out.println("Hello");
         System.out.println("World");
         System.out.println("from");
@@ -97,7 +98,7 @@ public class App {
     public static void addOrSubtractAndPrint(int initValue, int delta, boolean increment) {
         System.out.println("\n# addOrSubtractAndPrint");
 
-        if (increment == true) {
+        if (increment) {
             System.out.println("increment = true: " + (initValue + delta));
         } else {
             System.out.println("increment = false: " + (initValue - delta));
