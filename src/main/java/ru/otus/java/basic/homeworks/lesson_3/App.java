@@ -19,12 +19,7 @@ public class App {
     public static void greetings() {
         System.out.println("# greetings");
 
-        System.out.println("Hello");
-        System.out.println("World");
-        System.out.println("from");
-        System.out.println("Java");
-
-        // System.out.println("Hello\nWorld\nfrom\nJava");
+        System.out.print("Hello\nWorld\nfrom\nJava");
     }
 
     /**
@@ -37,7 +32,7 @@ public class App {
      *
      */
     public static void checkSign(int a, int b, int c) {
-        System.out.println("\n# checkSign");
+        System.out.println("\n\n# checkSign");
 
         int sum = a + b + c;
 
