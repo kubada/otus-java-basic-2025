@@ -12,13 +12,13 @@ public class App {
         boolean playAgain;
 
         do {
-            int player_choice;
+            int playerChoice;
 
             // random.nextInt(10) + 1: возвращается случайное число от 0 до 9
             // +1 сдвигает диапазон на 1, получается от 1 до 10.
-            int intended_number = random.nextInt(10) + 1;
+            int intendedNumber = random.nextInt(10) + 1;
 
-            System.out.print("Задуманное число (представьте, что Вы его не видите ^^): " + intended_number + "\n");
+            System.out.print("Задуманное число (представьте, что Вы его не видите ^^): " + intendedNumber + "\n");
 
             int attempt = 1;
 
@@ -27,24 +27,24 @@ public class App {
 
                 // Проверяем, что игрок ввёл число
                 if (scanner.hasNextInt()) {
-                    player_choice = scanner.nextInt();
+                    playerChoice = scanner.nextInt();
 
                     // Сначала проверяем, угадал ли игрок
-                    if (player_choice == intended_number) {
+                    if (playerChoice == intendedNumber) {
                         System.out.println("Угадали!");
                         break;
                     }
 
                     // Если не угадал, проверяем количество попыток
                     if (attempt < 3) {
-                        if (player_choice > intended_number) {
+                        if (playerChoice > intendedNumber) {
                             System.out.print("Много!");
                         } else {
                             System.out.print("Мало!");
                         }
                         attempt++;
                     } else {
-                        System.out.println("Не угадали за 3 попытки :(. Загаданное число: " + intended_number);
+                        System.out.println("Не угадали за 3 попытки :(. Загаданное число: " + intendedNumber);
                         break;
                     }
                 } else {
