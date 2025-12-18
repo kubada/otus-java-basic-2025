@@ -6,8 +6,7 @@ public class App {
     static void main() {
         methodOne(3, "ru.otus.java.basic.lesson_3");
 
-        int[] arrayTwoMethodTwo = {4, 8, 15, 16, 23, 42};
-        methodTwo(arrayTwoMethodTwo);
+        methodTwo(new int[]{4, 8, 15, 16, 23, 42});
 
         int[] arrayMethodThree = {4, 8, 15, 16, 23, 42};
         methodThree(0, arrayMethodThree);
@@ -15,12 +14,12 @@ public class App {
         int[] arrayMethodFour = {4, 8, 15, 16, 23, 42};
         methodFour(1, arrayMethodFour);
 
-        int[] arrayMethodFive = {4, 8, 15, 16, 23, 42};
-        methodFive(arrayMethodFive);
+        methodFive(new int[]{4, 8, 15, 16, 23, 42});
 
-        int[] arrayAsteriskOne = {1, 2, 3, 4, 5, 6};
-        int[] arrayAsteriskTwo = {1, 4, 4, 4, 0, 6};
-        asterisk(arrayAsteriskOne, arrayAsteriskTwo);
+        asterisk();
+
+
+        asteriskFour(new int[]{4, 8, 15, 16, 23, 42});
     }
 
     /**
@@ -50,7 +49,6 @@ public class App {
 
         for (int i : array) {
             if (i > 5) {
-                // System.out.println("Элемент массива, значение которого больше 5:" + i);
                 sum = sum + i;
             }
         }
@@ -111,11 +109,7 @@ public class App {
             sumRight = sumRight + array[i];
         }
 
-        if (sumLeft > sumRight) {
-            System.out.println("Сумма большей половины массива (левая): " + sumLeft);
-        } else System.out.println("Сумма большей половины массива (правая): " + sumRight);
-
-        // System.out.println(Math.max(sumLeft, sumRight));
+        System.out.println("Сумма большей половины массива: " + Math.max(sumLeft, sumRight));
 
     }
 
@@ -123,10 +117,75 @@ public class App {
      * Сверить два массива, и посчитать сколько элементов в них имеют одно значение и стоят на одном и том же месте.
      * Пример: ('1' 2 3 '4' 5 '6') ('1' 4 4 '4' 0 '6') => 3 элемента
      */
-    public static void asterisk(int[] arrayOne, int[] arrayTwo) {
+    public static void asterisk() {
         System.out.println("\n# asterisk");
 
+        int[] arrayOne = {1, 2, 3, 4, 5, 6};
+        int[] arrayTwo = {1, 4, 4, 4, 0, 6};
+
+        int countElemnts = 0;
+
+        for (int iOne = 0; iOne < arrayOne.length; iOne++) {
+            System.out.printf("Индекс %d - arrayOne: %d, arrayTwo: %d\n", iOne, arrayOne[iOne], arrayTwo[iOne]);
+
+            if (arrayOne[iOne] == arrayTwo[iOne]) {
+                countElemnts++;
+            }
+        }
+        System.out.printf("Элементов с одинаковым значением в двух массивах: %d\n", countElemnts);
+    }
+
+    /**
+     * Реализуйте метод, принимающий на вход набор целочисленных массивов, и получающий новый массив равный сумме входящих;
+     * Пример: { 1, 2, 3 } + { 2, 2 } + { 1, 1, 1, 1, 1} = { 4, 5, 4, 1, 1 }
+     */
+    public static void asteriskOne(int[] arrayOne, int[] arrayTwo, int[] arrayThree) {
 
     }
 
+    /**
+     * Реализуйте метод, проверяющий, что есть “точка” в массиве, в которой сумма левой и правой части равны.
+     * “Точка находится между элементами”
+     * Пример: { 1, 1, 1, 1, 1, | 5 }, { 5, | 3, 4, -2 }, { 7, 2, 2, 2 }, { 9, 4 }
+     */
+
+    public static void asteriskTwo() {
+
+    }
+
+    /**
+     * Реализуйте метод, проверяющий, что все элементы массива идут в порядке убывания или возрастания (по выбору пользователя)
+     */
+
+    public static void asteriskThree() {
+
+    }
+
+    /**
+     * Реализуйте метод, “переворачивающий” входящий массив
+     * Пример: { 1 2 3 4 } => { 4 3 2 1 }
+     */
+
+    public static void asteriskFour(int[] array) {
+        System.out.println("\n# asteriskFour");
+        System.out.println("array: " + Arrays.toString(array));
+
+        // в условии не сказано, что нужно изменить исходный массив, поэтому просто копируем задом наперёд в новый массив
+        int[] reversed = new int[array.length];
+
+        for (int i = 0; i < array.length; i++) {
+            reversed[i] = array[array.length - 1 - i];
+        }
+
+        System.out.println("reversed после цикла: " + Arrays.toString(reversed));
+
+        // если нельзя использовать новый массив, тогда через временную переменную и то достаточно поменять одно половину
+        for (int i = 0; i < array.length / 2; i++) {
+            int temp = array[i];
+            array[i] = array[array.length - 1 - i];
+            array[array.length - 1 - i] = temp;
+        }
+
+        System.out.println("array после цикла: " + Arrays.toString(reversed));
+    }
 }
