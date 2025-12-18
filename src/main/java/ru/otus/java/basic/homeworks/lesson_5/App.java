@@ -1,6 +1,8 @@
 package ru.otus.java.basic.homeworks.lesson_5;
 
 import java.util.Arrays;
+import java.util.Random;
+import java.util.ArrayList;
 
 public class App {
     static void main() {
@@ -18,6 +20,11 @@ public class App {
 
         asterisk();
 
+        int[] arrayOneAsteriskOne = new Random().ints(3, 0, 11).toArray();
+        int[] arrayTwoAsteriskOne = new Random().ints(2, 0, 11).toArray();
+        int[] arrayThreeAsteriskOne = new Random().ints(5, 0, 11).toArray();
+
+        asteriskOne(arrayOneAsteriskOne, arrayTwoAsteriskOne, arrayThreeAsteriskOne);
 
         asteriskFour(new int[]{4, 8, 15, 16, 23, 42});
     }
@@ -139,9 +146,30 @@ public class App {
      * Реализуйте метод, принимающий на вход набор целочисленных массивов, и получающий новый массив равный сумме входящих;
      * Пример: { 1, 2, 3 } + { 2, 2 } + { 1, 1, 1, 1, 1} = { 4, 5, 4, 1, 1 }
      */
-    public static void asteriskOne(int[] arrayOne, int[] arrayTwo, int[] arrayThree) {
+    public static void asteriskOne(int[]... arrays) {
+        System.out.println("\n# asteriskOne");
 
+        int maxLength = 0;
 
+        for (int[] array : arrays) {
+            System.out.println("array: " + Arrays.toString(array));
+
+            if (array.length > maxLength) {
+                maxLength = array.length;
+            }
+        }
+
+        int[] result = new int[maxLength];
+
+        for (int[] array : arrays) {
+            for (int i = 0; i < maxLength; i++) {
+                if (i < array.length) {
+                    result[i] += array[i];
+                }
+            }
+        }
+
+        System.out.println("Результирующий массив (сумма входящих): " + Arrays.toString(result));
     }
 
     /**
@@ -186,4 +214,5 @@ public class App {
 
         System.out.println("array после цикла: " + Arrays.toString(reversed));
     }
+
 }
