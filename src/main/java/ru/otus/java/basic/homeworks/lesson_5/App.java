@@ -141,6 +141,7 @@ public class App {
      */
     public static void asteriskOne(int[] arrayOne, int[] arrayTwo, int[] arrayThree) {
 
+
     }
 
     /**
@@ -148,7 +149,6 @@ public class App {
      * “Точка находится между элементами”
      * Пример: { 1, 1, 1, 1, 1, | 5 }, { 5, | 3, 4, -2 }, { 7, 2, 2, 2 }, { 9, 4 }
      */
-
     public static void asteriskTwo() {
 
     }
@@ -156,7 +156,6 @@ public class App {
     /**
      * Реализуйте метод, проверяющий, что все элементы массива идут в порядке убывания или возрастания (по выбору пользователя)
      */
-
     public static void asteriskThree() {
 
     }
@@ -165,7 +164,6 @@ public class App {
      * Реализуйте метод, “переворачивающий” входящий массив
      * Пример: { 1 2 3 4 } => { 4 3 2 1 }
      */
-
     public static void asteriskFour(int[] array) {
         System.out.println("\n# asteriskFour");
         System.out.println("array: " + Arrays.toString(array));
