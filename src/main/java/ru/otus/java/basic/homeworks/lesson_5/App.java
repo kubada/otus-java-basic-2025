@@ -2,7 +2,6 @@ package ru.otus.java.basic.homeworks.lesson_5;
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.ArrayList;
 
 public class App {
     static void main() {
