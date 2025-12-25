@@ -5,17 +5,17 @@ import java.util.Random;
 
 public class App {
     static void main() {
-        methodOne(3, "ru.otus.java.basic.lesson_3");
+        repeatingPrint(3, "ru.otus.java.basic.lesson_3");
 
-        methodTwo(new int[]{4, 8, 15, 16, 23, 42});
+        sumArrayCondition(new int[]{4, 8, 15, 16, 23, 42});
 
         int[] arrayMethodThree = {4, 8, 15, 16, 23, 42};
-        methodThree(0, arrayMethodThree);
+        fillArray(0, arrayMethodThree);
 
         int[] arrayMethodFour = {4, 8, 15, 16, 23, 42};
-        methodFour(1, arrayMethodFour);
+        increaseArray(1, arrayMethodFour);
 
-        methodFive(new int[]{4, 8, 15, 16, 23, 42});
+        sumArrayHalf(new int[]{4, 8, 15, 16, 23, 42});
 
         asterisk();
 
@@ -24,6 +24,11 @@ public class App {
         int[] arrayThreeAsteriskOne = new Random().ints(5, 0, 11).toArray();
 
         asteriskOne(arrayOneAsteriskOne, arrayTwoAsteriskOne, arrayThreeAsteriskOne);
+
+        asteriskTwo(new int[]{5, 3, 4, -2});
+
+        asteriskThree(new int[]{1, 2, 3, 4, 5}, true);
+        asteriskThree(new int[]{5, 4, 3, 2, 1}, false);
 
         asteriskFour(new int[]{4, 8, 15, 16, 23, 42});
     }
@@ -34,7 +39,7 @@ public class App {
      * @param repeat int
      * @param text   String
      */
-    public static void methodOne(int repeat, String text) {
+    public static void repeatingPrint(int repeat, String text) {
         System.out.println("# methodOne");
 
         for (int i = 0; i < repeat; i++) {
@@ -47,7 +52,7 @@ public class App {
      * Суммирует все элементы, значение которых больше 5.
      * Выводит в консоль полученную сумму.
      */
-    public static void methodTwo(int[] array) {
+    public static void sumArrayCondition(int[] array) {
         System.out.println("\n# methodTwo");
         System.out.println("array: " + Arrays.toString(array));
 
@@ -55,7 +60,7 @@ public class App {
 
         for (int i : array) {
             if (i > 5) {
-                sum = sum + i;
+                sum += i;
             }
         }
 
@@ -66,7 +71,7 @@ public class App {
      * Принимает в качестве аргументов целое число и ссылку на целочисленный массив.
      * Заполняет каждую ячейку массива указанным числом.
      */
-    public static void methodThree(int number, int[] array) {
+    public static void fillArray(int number, int[] array) {
         System.out.println("\n# methodThree");
         System.out.println("array: " + Arrays.toString(array));
 
@@ -83,7 +88,7 @@ public class App {
      * Принимает в качестве аргументов целое число и ссылку на целочисленный массив.
      * Увеличивает каждый элемент массива на указанное число.
      */
-    public static void methodFour(int number, int[] array) {
+    public static void increaseArray(int number, int[] array) {
         System.out.println("\n# methodFour");
         System.out.println("array: " + Arrays.toString(array));
 
@@ -100,7 +105,7 @@ public class App {
      * Принимает в качестве аргумента целочисленный массив.
      * Выводит в консоль сумму элементов большей половины массива.
      */
-    public static void methodFive(int[] array) {
+    public static void sumArrayHalf(int[] array) {
         System.out.println("\n# methodFive");
         System.out.println("array: " + Arrays.toString(array));
 
@@ -131,7 +136,11 @@ public class App {
 
         int countElemnts = 0;
 
-        for (int iOne = 0; iOne < arrayOne.length; iOne++) {
+        if (arrayOne.length != arrayTwo.length) {
+            System.out.println("Длины массивов разные, перебор по меньшему");
+        }
+
+        for (int iOne = 0; iOne < Math.min(arrayOne.length, arrayTwo.length); iOne++) {
             System.out.printf("Индекс %d - arrayOne: %d, arrayTwo: %d\n", iOne, arrayOne[iOne], arrayTwo[iOne]);
 
             if (arrayOne[iOne] == arrayTwo[iOne]) {
@@ -172,19 +181,82 @@ public class App {
     }
 
     /**
-     * Реализуйте метод, проверяющий, что есть “точка” в массиве, в которой сумма левой и правой части равны.
-     * “Точка находится между элементами”
+     * Реализуйте метод, проверяющий, что есть "точка" в массиве, в которой сумма левой и правой части равны.
+     * "Точка находится между элементами"
      * Пример: { 1, 1, 1, 1, 1, | 5 }, { 5, | 3, 4, -2 }, { 7, 2, 2, 2 }, { 9, 4 }
      */
-    public static void asteriskTwo() {
+    public static void asteriskTwo(int[] array) {
+        System.out.println("\n# asteriskTwo");
+        System.out.println("array: " + Arrays.toString(array));
 
+        boolean found = false;
+
+        // точка находится между элементами, поэтому проверяем от 1 до length-1
+        for (int i = 1; i < array.length; i++) {
+            int sumLeft = 0;
+            int sumRight = 0;
+
+            // считаем сумму слева от точки (элементы от 0 до i-1)
+            for (int j = 0; j < i; j++) {
+                sumLeft += array[j];
+            }
+
+            // считаем сумму справа от точки (элементы от i до конца)
+            for (int j = i; j < array.length; j++) {
+                sumRight += array[j];
+            }
+
+            System.out.printf("Точка после индекса %d: sumLeft = %d, sumRight = %d\n", i - 1, sumLeft, sumRight);
+
+            if (sumLeft == sumRight) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Точка баланса не найдена");
+        }
     }
 
     /**
      * Реализуйте метод, проверяющий, что все элементы массива идут в порядке убывания или возрастания (по выбору пользователя)
      */
-    public static void asteriskThree() {
+    public static void asteriskThree(int[] array, boolean ascending) {
+        System.out.println("\n# asteriskThree");
+        System.out.println("array: " + Arrays.toString(array));
+        System.out.println("Проверка на " + (ascending ? "возрастание" : "убывание"));
 
+        if (array.length < 2) {
+            System.out.println("Массив слишком короткий для проверки");
+            return;
+        }
+
+        boolean isSorted = true;
+
+        for (int i = 0; i < array.length - 1; i++) {
+            if (ascending) {
+                // проверка на возрастание
+                if (array[i] > array[i + 1]) {
+                    System.out.printf("Нарушение на индексе %d: %d > %d\n", i, array[i], array[i + 1]);
+                    isSorted = false;
+                    break;
+                }
+            } else {
+                // проверка на убывание
+                if (array[i] < array[i + 1]) {
+                    System.out.printf("Нарушение на индексе %d: %d < %d\n", i, array[i], array[i + 1]);
+                    isSorted = false;
+                    break;
+                }
+            }
+        }
+
+        if (isSorted) {
+            System.out.println("Массив отсортирован " + (ascending ? "по возрастанию" : "по убыванию"));
+        } else {
+            System.out.println("Массив НЕ отсортирован " + (ascending ? "по возрастанию" : "по убыванию"));
+        }
     }
 
     /**
