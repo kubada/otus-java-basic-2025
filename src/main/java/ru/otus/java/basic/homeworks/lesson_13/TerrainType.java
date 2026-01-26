@@ -4,17 +4,15 @@ package ru.otus.java.basic.homeworks.lesson_13;
  * Перечисление типов местности.
  */
 public enum TerrainType {
-    /** Густой лес */
-    DENSE_FOREST ("Густой лес"),
-    /** Равнина */
-    PLAIN ("Равнина"),
-    /** Болото */
-    SWAMP ("Болото");
+    DENSE_FOREST("Густой лес"),
+    PLAIN("Равнина"),
+    SWAMP("Болото");
 
     private final String title;
 
     /**
      * Создаёт тип местности с указанным названием.
+     *
      * @param title название местности
      */
     TerrainType(String title) {
@@ -23,6 +21,7 @@ public enum TerrainType {
 
     /**
      * Возвращает название местности.
+     *
      * @return название местности
      */
     public String getTitle() {

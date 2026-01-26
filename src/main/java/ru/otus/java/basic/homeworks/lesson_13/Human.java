@@ -38,6 +38,7 @@ public class Human {
     public void setTransport(Transport transport) {
         if (currentTransport == null) {
             this.currentTransport = transport;
+            transport.setDriver(this);
             System.out.printf("* Человек \"%s\" выполнил [посадку] на транспорт [%s].%n",
                     name, transport);
         } else {
@@ -59,11 +60,12 @@ public class Human {
 
         if (currentTransport == transport) {
             this.currentTransport = null;
+            transport.setDriver(null);
             System.out.printf("* Человек \"%s\" выполнил [сход] с транспорта [%s].%n",
-            name, transport);
+                    name, transport);
         } else {
             System.out.printf("! Человек \"%s\" не может выполнить [сход] с транспорта [%s], т.к. не находится на нём.%n",
-            name, transport);
+                    name, transport);
         }
     }
 
@@ -75,6 +77,7 @@ public class Human {
      * @param terrain  тип местности
      * @return true, если перемещение успешно выполнено, false в противном случае
      */
+    @SuppressWarnings("UnusedReturnValue")
     public boolean move(int distance, TerrainType terrain) {
         if (currentTransport != null) {
             return currentTransport.move(distance, terrain);

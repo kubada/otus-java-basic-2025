@@ -6,7 +6,7 @@ package ru.otus.java.basic.homeworks.lesson_13;
  * Перемещается без ограничений.
  * При перемещении тратит бензин (ограничен).
  */
-public class AllTerrainVehicle extends AbstractTransport{
+public class AllTerrainVehicle extends AbstractTransport {
     private double petrol;
     private final double petrolPerUnit;
 
@@ -21,6 +21,7 @@ public class AllTerrainVehicle extends AbstractTransport{
     /**
      * Проверяет, может ли вездеход перемещаться по указанному типу местности.
      * Вездеход может ехать по любой местности без ограничений.
+     *
      * @param terrain тип местности
      * @return всегда true
      */
@@ -31,6 +32,7 @@ public class AllTerrainVehicle extends AbstractTransport{
 
     /**
      * Рассчитывает необходимое количество топлива для перемещения на указанную дистанцию.
+     *
      * @param distance дистанция перемещения
      * @return требуемое количество топлива
      */
@@ -42,6 +44,7 @@ public class AllTerrainVehicle extends AbstractTransport{
 
     /**
      * Проверяет, достаточно ли топлива для перемещения на указанную дистанцию.
+     *
      * @param distance дистанция перемещения
      * @return true, если топлива достаточно
      */
@@ -53,6 +56,7 @@ public class AllTerrainVehicle extends AbstractTransport{
 
     /**
      * Расходует топливо при перемещении на указанную дистанцию.
+     *
      * @param distance дистанция перемещения
      * @return количество затраченного топлива
      */
@@ -65,6 +69,7 @@ public class AllTerrainVehicle extends AbstractTransport{
 
     /**
      * Возвращает текущий остаток топлива.
+     *
      * @return остаток топлива
      */
     @Override
@@ -74,6 +79,7 @@ public class AllTerrainVehicle extends AbstractTransport{
 
     /**
      * Возвращает название транспорта.
+     *
      * @return название "Вездеход"
      */
     @Override

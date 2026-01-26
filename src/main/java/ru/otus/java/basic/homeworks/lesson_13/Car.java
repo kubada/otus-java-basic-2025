@@ -21,6 +21,7 @@ public class Car extends AbstractTransport {
     /**
      * Проверяет, может ли машина перемещаться по указанному типу местности.
      * Машина не может ехать по густому лесу и болоту.
+     *
      * @param terrain тип местности
      * @return true, если машина может ехать по этой местности
      */
@@ -31,6 +32,7 @@ public class Car extends AbstractTransport {
 
     /**
      * Рассчитывает необходимое количество топлива для перемещения на указанную дистанцию.
+     *
      * @param distance дистанция перемещения
      * @return требуемое количество топлива
      */
@@ -41,6 +43,7 @@ public class Car extends AbstractTransport {
 
     /**
      * Проверяет, достаточно ли бензина для перемещения на указанную дистанцию.
+     *
      * @param distance дистанция перемещения
      * @return true, если бензина достаточно
      */
@@ -52,6 +55,7 @@ public class Car extends AbstractTransport {
 
     /**
      * Расходует бензин при перемещении на указанную дистанцию.
+     *
      * @param distance дистанция перемещения
      * @return количество затраченного бензина
      */
@@ -64,6 +68,7 @@ public class Car extends AbstractTransport {
 
     /**
      * Возвращает текущий остаток бензина.
+     *
      * @return остаток бензина
      */
     @Override
@@ -73,6 +78,7 @@ public class Car extends AbstractTransport {
 
     /**
      * Возвращает название транспорта.
+     *
      * @return название "Машина"
      */
     @Override
