@@ -14,15 +14,14 @@ public class PhoneBook {
      *
      * @param person      объект Person с данными человека
      * @param phoneNumber номер телефона
+     * @throws IllegalArgumentException если номер телефона null или пустой
      */
     public static void add(Person person, String phoneNumber) {
         String fullName = getFullName(person);
 
         if (phoneNumber == null || phoneNumber.isBlank()) {
-            System.out.println("Нельзя добавить пустой номер");
-            return;
+            throw new IllegalArgumentException("Нельзя добавить пустой номер");
         }
-
 
         if (book.containsKey(fullName)) {
             book.get(fullName).add(phoneNumber);
@@ -37,23 +36,30 @@ public class PhoneBook {
     }
 
     /**
-     * Ищет и возвращает все номера телефонов для указанного человека.
+     * Ищет и возвращает все номера телефонов для людей, ФИО которых содержит указанную подстроку.
+     * Поиск регистронезависимый.
      *
-     * @param person объект Person с данными человека
-     * @return список номеров телефонов для указанного человека, или null если человек не найден
+     * @param searchQuery поисковый запрос (часть имени, фамилии или полное ФИО)
+     * @return список номеров телефонов найденных людей, или пустой список если никто не найден
      */
     @SuppressWarnings("UnusedReturnValue")
-    public static ArrayList<String> find(Person person) {
-        String fullName = getFullName(person);
+    public static ArrayList<String> find(String searchQuery) {
+        ArrayList<String> result = new ArrayList<>();
+        boolean found = false;
 
-        if (book.containsKey(fullName)) {
-            ArrayList<String> phoneNumbers = new ArrayList<>(book.get(fullName));
-            System.out.printf("* Найдена запись: \"%s\" - %s %n", fullName, phoneNumbers);
-            return phoneNumbers;
-        } else {
-            System.out.printf("! Запись \"%s\" отсутствует в справочнике %n", fullName);
-            return null;
+        for (Map.Entry<String, List<String>> entry : book.entrySet()) {
+            if (entry.getKey().toLowerCase().contains(searchQuery.toLowerCase())) {
+                found = true;
+                System.out.printf("* Найдена запись (по запросу \"%s\"): \"%s\" - %s %n", searchQuery, entry.getKey(), entry.getValue());
+                result.addAll(entry.getValue());
+            }
         }
+
+        if (!found) {
+            System.out.printf("! Записи, содержащие \"%s\", отсутствуют в справочнике %n", searchQuery);
+        }
+
+        return result;
     }
 
     /**
@@ -80,7 +86,7 @@ public class PhoneBook {
      * @param person объект Person с данными человека
      * @return строку вида "Имя Фамилия Отчество"
      */
-    private static String getFullName(Person person) {
+    public static String getFullName(Person person) {
         return person.getFirstName() + " " + person.getLastName() + " " + person.getMiddleName();
     }
 }
