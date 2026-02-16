@@ -17,7 +17,7 @@ public class WriteFile {
      */
     public static boolean write(File file, String content) {
         try (FileOutputStream out = new FileOutputStream(file, true)) {
-            byte[] buffer = ("\n" + content).getBytes(StandardCharsets.UTF_8);
+            byte[] buffer = (System.lineSeparator() + content).getBytes(StandardCharsets.UTF_8);
             out.write(buffer);
             return true;
         } catch (IOException e) {
