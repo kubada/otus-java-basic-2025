@@ -57,39 +57,7 @@ public class Server {
                                 continue;
                             }
 
-                            int mathResult = 0;
-                            boolean isValid = true;
-
-                            String mathOperation = userInputParts[2];
-
-                            switch (mathOperation) {
-                                case "+":
-                                    mathResult = a + b;
-                                    break;
-                                case "-":
-                                    mathResult = a - b;
-                                    break;
-                                case "*":
-                                    mathResult = a * b;
-                                    break;
-                                case "/":
-                                    if (b == 0) {
-                                        outputStream.writeUTF("!! деление на ноль невозможно");
-                                        isValid = false;
-                                    } else {
-                                        mathResult = a / b;
-                                    }
-                                    break;
-                                default:
-                                    outputStream.writeUTF("!! неизвестная математическая операция");
-                                    isValid = false;
-                            }
-
-                            if (isValid) {
-                                outputStream.writeUTF("результат математической операции: " + mathResult);
-                            }
-                            outputStream.writeUTF("END");
-                            outputStream.flush();
+                            Calculator.calculate(a, b, userInputParts[2], outputStream);
 
 
                         } catch (IOException e) {
