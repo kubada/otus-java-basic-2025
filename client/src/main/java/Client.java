@@ -4,19 +4,24 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
+/**
+ * Клиент для подключения к чат-серверу.
+ */
 public class Client {
-    private Socket socket;
-    private DataOutputStream out;
-    private DataInputStream in;
+    private final Socket socket;
+    private final DataOutputStream out;
+    private final DataInputStream in;
+    private final Scanner sc;
 
-    private String host;
-    private int port;
+    private static final System.Logger logger = System.getLogger(Client.class.getName());
 
-    Scanner sc;
-
+    /**
+     * Создаёт клиента и подключается к серверу.
+     *
+     * @param host адрес сервера
+     * @param port порт сервера
+     */
     public Client(String host, int port) {
-        this.host = host;
-        this.port = port;
 
         try {
             sc = new Scanner(System.in);
@@ -29,14 +34,14 @@ public class Client {
                     while (true) {
                         String message = in.readUTF();
                         if (message.startsWith("/")) {
-                            if (message.equals("/exitok")){
+                            if (message.equals("/exitok")) {
                                 break;
                             }
                         }
                         System.out.println(message);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.log(System.Logger.Level.ERROR, "Ошибка чтения сообщения", e.getMessage());
                 } finally {
                     disconnect();
                 }
@@ -45,7 +50,7 @@ public class Client {
             while (true) {
                 String message = sc.nextLine();
                 out.writeUTF(message);
-                if (message.equals("/exit")){
+                if (message.equals("/exit")) {
                     break;
                 }
             }
@@ -56,30 +61,31 @@ public class Client {
 
     }
 
+    /**
+     * Отключает клиента от сервера и закрывает ресурсы.
+     */
     private void disconnect() {
-        try {
-            if (in != null) {
-                in.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (out != null) {
-                out.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (socket != null) {
-                socket.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        closeResource(in, "DataInputStream");
+        closeResource(out, "DataOutputStream");
+        closeResource(socket, "Socket");
         if (sc != null) {
             sc.close();
+        }
+    }
+
+    /**
+     * Закрывает ресурс с обработкой исключения.
+     *
+     * @param resource ресурс для закрытия
+     * @param name     имя ресурса для логирования
+     */
+    private void closeResource(AutoCloseable resource, String name) {
+        if (resource != null) {
+            try {
+                resource.close();
+            } catch (Exception e) {
+                logger.log(System.Logger.Level.WARNING, "Ошибка закрытия " + name, e);
+            }
         }
     }
 }

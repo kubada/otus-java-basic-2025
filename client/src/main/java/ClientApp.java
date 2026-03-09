@@ -1,5 +1,6 @@
-public class ClientApp {
-    public static void main(String[] args) {
-        new Client("localhost", 8189);
-    }
+/**
+ * Точка входа для запуска клиента чата.
+ */
+void main() {
+    new Client("localhost", 8189);
 }
