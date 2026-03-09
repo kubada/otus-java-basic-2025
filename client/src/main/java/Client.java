@@ -41,7 +41,7 @@ public class Client {
                         System.out.println(message);
                     }
                 } catch (IOException e) {
-                    logger.log(System.Logger.Level.ERROR, "Ошибка чтения сообщения", e.getMessage());
+                    logger.log(System.Logger.Level.ERROR, "Ошибка чтения сообщения", e);
                 } finally {
                     disconnect();
                 }

@@ -28,7 +28,7 @@ public class Server {
      */
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            logger.log(System.Logger.Level.INFO, "Server started. port", port);
+            logger.log(System.Logger.Level.INFO, "Server started. port: " + port);
 
             while (true) {
                 Socket socket = serverSocket.accept();
@@ -46,7 +46,7 @@ public class Server {
      * @param clientHandler обработчик клиента
      */
     public void subscribe(ClientHandler clientHandler) {
-        broadcastMessage("Подключился пользователь " + clientHandler.getUsername());
+        broadcastMessage("> Подключился пользователь: " + clientHandler.getUsername());
         clients.add(clientHandler);
     }
 
@@ -56,7 +56,7 @@ public class Server {
      * @param clientHandler обработчик клиента
      */
     public void unsubscribe(ClientHandler clientHandler) {
-        broadcastMessage("Пользователь " + clientHandler.getUsername() + " покинул чат");
+        broadcastMessage("> Пользователь " + clientHandler.getUsername() + " покинул чат");
         clients.remove(clientHandler);
     }
 
@@ -70,4 +70,42 @@ public class Server {
             c.sendMsg(message);
         }
     }
+
+    /**
+     * Возвращает количество и имена подключенных клиентов.
+     *
+     * @return количество и имена подключенных клиентов
+     */
+    public String getOnlineUsersInfo() {
+        if (clients.isEmpty()) {
+            return "> Вы один в чате";
+        }
+
+        StringBuilder sb = new StringBuilder("> Подключенных участников ");
+        sb.append(clients.size()).append(": ");
+        for (int i = 0; i < clients.size(); i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+            sb.append(clients.get(i).getUsername());
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Ищет пользователя в списке подключенных клиентов.
+     *
+     * @param username ник пользователя для поиска в списке клиентов сервера
+     * @return объект пользователя сервера
+     */
+    public ClientHandler findClientByUsername(String username) {
+        for (ClientHandler c : clients) {
+            if (c.getUsername().equals(username)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+
 }

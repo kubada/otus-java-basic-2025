@@ -28,20 +28,30 @@ public class ClientHandler {
         this.socket = socket;
         this.in = new DataInputStream(socket.getInputStream());
         this.out = new DataOutputStream(socket.getOutputStream());
-        logger.log(System.Logger.Level.INFO, "Client connected port", socket.getPort());
+        logger.log(System.Logger.Level.INFO, "Client connected port: " + socket.getPort());
 
         username = "user" + socket.getPort();
-        sendMsg("Вы подключились под ником: " + username);
+        sendMsg("> Вы подключились под ником: " + username);
+        sendMsg(server.getOnlineUsersInfo());
+        sendMsg(AvailableCommands.getHelpMessage());
 
         new Thread(() -> {
             try {
                 while (true) {
                     String message = in.readUTF();
-                    //  /служебные сообщения
                     if (message.startsWith("/")) {
-                        if (message.equals("/exit")) {
+                        AvailableCommands cmd = AvailableCommands.findCommand(message);
+
+                        if (cmd == null) {
+                            sendMsg("Неизвестная команда. " + AvailableCommands.getHelpMessage());
+                        } else if (cmd == AvailableCommands.HELP) {
+                            sendMsg(AvailableCommands.getHelpMessage());
+                        } else if (cmd == AvailableCommands.EXIT) {
                             sendMsg("/exitok");
-                            break;
+                        } else if (cmd == AvailableCommands.NICK) {
+                            handleNick(message);
+                        } else if (cmd == AvailableCommands.WHISPER) {
+                            handleWhisper(message);
                         }
                     } else {
                         server.broadcastMessage(username + ": " + message);
@@ -64,6 +74,7 @@ public class ClientHandler {
         try {
             out.writeUTF(message);
         } catch (IOException e) {
+            logger.log(System.Logger.Level.ERROR, "Ошибка отправки сообщения", e);
             throw new RuntimeException(e);
         }
     }
@@ -87,11 +98,73 @@ public class ClientHandler {
     }
 
     /**
+     * Обрабатывает команду смены никнейма.
+     *
+     * @param message сообщение с командой
+     */
+    private void handleNick(String message) {
+        String[] parts = message.split("\\s+", 2);
+        if (parts.length >= 2 && !parts[1].isEmpty()) {
+            String newNick = parts[1];
+
+            if (newNick.equals(username)) {
+                sendMsg("! Вы уже используете этот ник");
+            } else if (server.findClientByUsername(newNick) != null) {
+                sendMsg("! Ник " + newNick + " уже занят");
+            } else if (newNick.trim().isEmpty()) {
+                sendMsg("! Ник не может быть пустым");
+            } else if (newNick.contains(" ")) {
+                sendMsg("! Ник не может содержать пробелы");
+            } else if (newNick.startsWith("/")) {
+                sendMsg("! Ник не может начинаться с /");
+            } else {
+                String oldNick = username;
+                setUsername(newNick);
+                sendMsg("! Ваш ник изменён. Новый ник: " + getUsername());
+                server.broadcastMessage(oldNick + " теперь известен как " + getUsername());
+            }
+        } else {
+            sendUsageMessage(AvailableCommands.NICK);
+        }
+    }
+
+    /**
+     * Обрабатывает команду отправки личного сообщения.
+     *
+     * @param message сообщение с командой
+     */
+    private void handleWhisper(String message) {
+        String[] parts = message.split("\\s+", 3);
+        if (parts.length >= 3 && !parts[1].isEmpty()) {
+            String recipientNick = parts[1];
+            String messageText = parts[2];
+
+            if (recipientNick.equals(username)) {
+                sendMsg("! Нельзя отправить ЛС самому себе");
+            } else {
+                ClientHandler recipient = server.findClientByUsername(recipientNick);
+                if (recipient != null) {
+                    recipient.sendMsg("> ЛС от " + username + ": " + messageText);
+                    sendMsg("* Сообщение отправлено пользователю " + recipientNick);
+                } else {
+                    sendMsg("! Пользователь " + recipientNick + " не найден");
+                }
+            }
+        } else {
+            sendUsageMessage(AvailableCommands.WHISPER);
+        }
+    }
+
+    private void sendUsageMessage(AvailableCommands cmd) {
+        sendMsg("* " + cmd.getDescription() + ": " + cmd.getUsage());
+    }
+
+    /**
      * Отключает клиента и закрывает ресурсы.
      */
     private void disconnect() {
         server.unsubscribe(this);
-        logger.log(System.Logger.Level.INFO, "Client disconnected port", socket.getPort());
+        logger.log(System.Logger.Level.INFO, "Client disconnected port: " + socket.getPort());
         closeResource(in, "DataInputStream");
         closeResource(out, "DataOutputStream");
         closeResource(socket, "Socket");
