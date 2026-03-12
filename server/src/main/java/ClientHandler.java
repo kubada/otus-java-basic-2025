@@ -68,7 +68,6 @@ public class ClientHandler {
                         if (server.getAuthenticatedProvider().register(this, token[1], token[2], token[3])) {
                             isAuthenticate = true;
                         }
-                        continue;
                     }
                 }
             }
