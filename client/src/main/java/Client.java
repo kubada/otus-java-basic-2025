@@ -37,11 +37,24 @@ public class Client {
                             if (message.equals("/exitok")) {
                                 break;
                             }
+                            if (message.startsWith("/authok ")) {
+                                System.out.println("Успешный вход; Имя пользователя " + message.split(" ")[1]);
+                                continue;
+                            }
+                            if (message.startsWith("/regok ")) {
+                                System.out.println("Успешная регистрация; Имя пользователя " + message.split(" ")[1]);
+                                continue;
+                            }
                         }
                         System.out.println(message);
                     }
                 } catch (IOException e) {
-                    logger.log(System.Logger.Level.ERROR, "Ошибка чтения сообщения", e);
+                    if (e instanceof java.io.EOFException || e instanceof
+                            java.net.SocketException) {
+                        System.out.println("! Соединение с сервером разорвано");
+                    } else {
+                        logger.log(System.Logger.Level.ERROR, "Ошибка чтения сообщения", e);
+                    }
                 } finally {
                     disconnect();
                 }
