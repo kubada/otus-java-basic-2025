@@ -124,7 +124,7 @@ public class Server {
     /**
      * Ищет пользователя в списке подключенных клиентов.
      *
-     * @param username ник пользователя для поиска
+     * @param username имя пользователя для поиска
      * @return ClientHandler пользователя или null, если не найден
      */
     public ClientHandler findClientByUsername(String username) {
@@ -136,6 +136,11 @@ public class Server {
         return null;
     }
 
+    /**
+     * Возвращает провайдер аутентификации.
+     *
+     * @return провайдер аутентификации
+     */
     public AuthenticatedProvider getAuthenticatedProvider() {
         return authenticatedProvider;
     }

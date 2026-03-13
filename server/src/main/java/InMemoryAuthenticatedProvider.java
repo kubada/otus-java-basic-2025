@@ -9,19 +9,19 @@ public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
      * Внутренний класс для представления пользователя.
      */
     private static class User {
-        private final String login;
+        private final String nickname;
         private final String password;
         private final String username;
 
         /**
          * Создаёт пользователя с указанными данными.
          *
-         * @param login    логин пользователя
+         * @param nickname    ник пользователя
          * @param password пароль пользователя
          * @param username отображаемое имя пользователя
          */
-        public User(String login, String password, String username) {
-            this.login = login;
+        public User(String nickname, String password, String username) {
+            this.nickname = nickname;
             this.password = password;
             this.username = username;
         }
@@ -39,7 +39,7 @@ public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
         this.server = server;
         this.users = new CopyOnWriteArrayList<>();
         for (DemoUsers demoUser : DemoUsers.values()) {
-            this.users.add(new User(demoUser.getLogin(), demoUser.getPassword(), demoUser.getUsername()));
+            this.users.add(new User(demoUser.getNickname(), demoUser.getPassword(), demoUser.getUsername()));
         }
     }
 
@@ -49,15 +49,15 @@ public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
     }
 
     /**
-     * Ищет username по логину и паролю.
+     * Ищет username по нику и паролю.
      *
-     * @param login    логин пользователя
+     * @param nickname    ник пользователя
      * @param password пароль пользователя
      * @return username если найден, null иначе
      */
-    private String getUsernameByLoginAndPassword(String login, String password) {
+    private String getUsernameByNicknameAndPassword(String nickname, String password) {
         for (User u : users) {
-            if (u.login.equals(login) && u.password.equals(password)) {
+            if (u.nickname.equals(nickname) && u.password.equals(password)) {
                 return u.username;
             }
         }
@@ -65,14 +65,14 @@ public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
     }
 
     /**
-     * Проверяет существование логина в базе.
+     * Проверяет существование ника в базе.
      *
-     * @param login логин для проверки
-     * @return true если логин существует, false иначе
+     * @param nickname ник для проверки
+     * @return true если ник существует, false иначе
      */
-    private boolean isLoginAlreadyExists(String login) {
+    private boolean isNicknameAlreadyExists(String nickname) {
         for (User u : users) {
-            if (u.login.equals(login)) {
+            if (u.nickname.equals(nickname)) {
                 return true;
             }
         }
@@ -95,14 +95,14 @@ public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
     }
 
     @Override
-    public boolean authenticate(ClientHandler clientHandler, String login, String password) {
-        String authUsername = getUsernameByLoginAndPassword(login, password);
+    public boolean authenticate(ClientHandler clientHandler, String nickname, String password) {
+        String authUsername = getUsernameByNicknameAndPassword(nickname, password);
         if (authUsername == null) {
-            clientHandler.sendMsg("Некорректный логин / пароль");
+            clientHandler.sendMsg("Некорректный ник / пароль");
             return false;
         }
         if (server.isUsernameBusy(authUsername)) {
-            clientHandler.sendMsg("Логин занят");
+            clientHandler.sendMsg("Имя пользователя занято");
             return false;
         }
         clientHandler.setUsername(authUsername);
@@ -114,7 +114,7 @@ public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
         }
 
         server.subscribe(clientHandler);
-        clientHandler.sendMsg("Вы подключились под ником: " + authUsername);
+        clientHandler.sendMsg("Вы подключились с именем: " + authUsername);
         clientHandler.sendMsg(server.getOnlineUsersInfo());
         clientHandler.sendMsg(AvailableCommands.getHelpMessage());
         clientHandler.sendMsg("/authok " + authUsername);
@@ -122,9 +122,9 @@ public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
     }
 
     @Override
-    public boolean register(ClientHandler clientHandler, String login, String password, String username) {
-        if (login.trim().length() < 3) {
-            clientHandler.sendMsg("Логин должен состоять из 3+ символов");
+    public boolean register(ClientHandler clientHandler, String nickname, String password, String username) {
+        if (nickname.trim().length() < 3) {
+            clientHandler.sendMsg("Ник должен состоять из 3+ символов");
             return false;
         }
         if (password.trim().length() < 3) {
@@ -135,15 +135,15 @@ public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
             clientHandler.sendMsg("Имя пользователя должно состоять из 3+ символов");
             return false;
         }
-        if (isLoginAlreadyExists(login)) {
-            clientHandler.sendMsg("Логин занят");
+        if (isNicknameAlreadyExists(nickname)) {
+            clientHandler.sendMsg("Ник занят");
             return false;
         }
         if (isUsernameAlreadyExists(username)) {
             clientHandler.sendMsg("Имя пользователя занято");
             return false;
         }
-        users.add(new User(login, password, username));
+        users.add(new User(nickname, password, username));
         clientHandler.setUsername(username);
 
         if (server.getClientsCount() == 0) {
@@ -153,7 +153,7 @@ public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
         }
 
         server.subscribe(clientHandler);
-        clientHandler.sendMsg("Вы успешно зарегистрировались и подключились под ником: " + username);
+        clientHandler.sendMsg("Вы успешно зарегистрировались с именем: " + username);
         clientHandler.sendMsg(server.getOnlineUsersInfo());
         clientHandler.sendMsg(AvailableCommands.getHelpMessage());
         clientHandler.sendMsg("/regok " + username);

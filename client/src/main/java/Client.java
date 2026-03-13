@@ -38,11 +38,11 @@ public class Client {
                                 break;
                             }
                             if (message.startsWith("/authok ")) {
-                                System.out.println("Успешный вход; Имя пользователя " + message.split(" ")[1]);
+                                System.out.println("Успешный вход; Имя пользователя: " + message.split(" ")[1]);
                                 continue;
                             }
                             if (message.startsWith("/regok ")) {
-                                System.out.println("Успешная регистрация; Имя пользователя " + message.split(" ")[1]);
+                                System.out.println("Успешная регистрация; Имя пользователя: " + message.split(" ")[1]);
                                 continue;
                             }
                         }

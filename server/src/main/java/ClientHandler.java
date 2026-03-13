@@ -31,53 +31,51 @@ public class ClientHandler {
         this.out = new DataOutputStream(socket.getOutputStream());
         logger.log(System.Logger.Level.INFO, "Клиент подключен, порт: " + socket.getPort());
 
-        // Цикл аутентификации
-        boolean isAuthenticate = false;
-        try {
-            while (!isAuthenticate) {
-                sendMsg("Перед работой с чатом необходимо выполнить аутентификацию");
-                sendMsg("/auth <login> <password> или зарегистрироваться");
-                sendMsg("/reg <login> <password> <username>");
+        new Thread(() -> {
+            boolean isAuthenticate = false;
+            try {
+                while (!isAuthenticate) {
+                    sendMsg("Перед работой с чатом необходимо выполнить аутентификацию: /auth <nickname> <password>");
+                    sendMsg("Или зарегистрироваться: /reg <nickname> <password> <username>");
 
-                String message = in.readUTF();
-                if (message.startsWith("/")) {
-                    if (message.equals("/exit")) {
-                        sendMsg("/exitok");
-                        disconnect();
-                        return;
-                    }
+                    String message = in.readUTF();
+                    if (message.startsWith("/")) {
+                        if (message.equals("/exit")) {
+                            sendMsg("/exitok");
+                            disconnect();
+                            return;
+                        }
 
-                    if (message.startsWith("/auth ")) {
-                        String[] token = message.trim().split("\\s+");
-                        if (token.length != 3) {
-                            sendMsg("Неверный формат команды /auth");
+                        if (message.startsWith("/auth ")) {
+                            String[] token = message.trim().split("\\s+");
+                            if (token.length != 3) {
+                                sendMsg("Неверный формат команды /auth");
+                                continue;
+                            }
+                            if (server.getAuthenticatedProvider().authenticate(this, token[1], token[2])) {
+                                isAuthenticate = true;
+                            }
                             continue;
                         }
-                        if (server.getAuthenticatedProvider().authenticate(this, token[1], token[2])) {
-                            isAuthenticate = true;
-                        }
-                        continue;
-                    }
 
-                    if (message.startsWith("/reg ")) {
-                        String[] token = message.trim().split("\\s+");
-                        if (token.length != 4) {
-                            sendMsg("Неверный формат команды /reg");
-                            continue;
-                        }
-                        if (server.getAuthenticatedProvider().register(this, token[1], token[2], token[3])) {
-                            isAuthenticate = true;
+                        if (message.startsWith("/reg ")) {
+                            String[] token = message.trim().split("\\s+");
+                            if (token.length != 4) {
+                                sendMsg("Неверный формат команды /reg");
+                                continue;
+                            }
+                            if (server.getAuthenticatedProvider().register(this, token[1], token[2], token[3])) {
+                                isAuthenticate = true;
+                            }
                         }
                     }
                 }
+            } catch (IOException e) {
+                logger.log(System.Logger.Level.WARNING, "Ошибка в цикле аутентификации", e);
+                disconnect();
+                return;
             }
-        } catch (IOException e) {
-            logger.log(System.Logger.Level.WARNING, "Ошибка в цикле аутентификации", e);
-            disconnect();
-            return;
-        }
 
-        new Thread(() -> {
             try {
                 while (true) {
                     String message = in.readUTF();
@@ -92,8 +90,8 @@ public class ClientHandler {
                             sendMsg("> Вы: " + username + ", ваша роль: " + role);
                         } else if (cmd == AvailableCommands.EXIT) {
                             sendMsg("/exitok");
-                        } else if (cmd == AvailableCommands.NICK) {
-                            handleNick(message);
+                        } else if (cmd == AvailableCommands.NAME) {
+                            handleName(message);
                         } else if (cmd == AvailableCommands.WHISPER) {
                             handleWhisper(message);
                         } else if (cmd == AvailableCommands.ALL) {
@@ -112,6 +110,8 @@ public class ClientHandler {
             } catch (IOException e) {
                 if (e instanceof java.io.EOFException) {
                     logger.log(System.Logger.Level.INFO, "Клиент отключился");
+                } else if (e instanceof java.net.SocketException) {
+                    logger.log(System.Logger.Level.INFO, "Соединение с клиентом разорвано");
                 } else {
                     logger.log(System.Logger.Level.ERROR, "Ошибка чтения сообщения от клиента", e);
                 }
@@ -131,8 +131,7 @@ public class ClientHandler {
         try {
             out.writeUTF(message);
         } catch (IOException e) {
-            logger.log(System.Logger.Level.ERROR, "Ошибка отправки сообщения", e);
-            throw new RuntimeException(e);
+            logger.log(System.Logger.Level.WARNING, "Ошибка отправки сообщения клиенту", e);
         }
     }
 
@@ -173,14 +172,6 @@ public class ClientHandler {
     }
 
     /**
-     * Повышает пользователя до владельца чата.
-     */
-    public void promoteToOwner() {
-        this.role = AvailableRoles.OWNER;
-        sendMsg("! Вы стали владельцем чата");
-    }
-
-    /**
      * Повышает пользователя до администратора.
      */
     public void promoteToAdmin() {
@@ -197,33 +188,33 @@ public class ClientHandler {
     }
 
     /**
-     * Обрабатывает команду смены никнейма.
+     * Обрабатывает команду смены имени пользователя.
      *
      * @param message сообщение с командой
      */
-    private void handleNick(String message) {
+    private void handleName(String message) {
         String[] parts = message.split("\\s+", 2);
         if (parts.length >= 2 && !parts[1].isEmpty()) {
-            String newNick = parts[1];
+            String newName = parts[1];
 
-            if (newNick.equals(username)) {
-                sendMsg("! Вы уже используете этот ник");
-            } else if (server.findClientByUsername(newNick) != null) {
-                sendMsg("! Ник " + newNick + " уже занят");
-            } else if (newNick.trim().isEmpty()) {
-                sendMsg("! Ник не может быть пустым");
-            } else if (newNick.contains(" ")) {
-                sendMsg("! Ник не может содержать пробелы");
-            } else if (newNick.startsWith("/")) {
-                sendMsg("! Ник не может начинаться с /");
+            if (newName.trim().isEmpty()) {
+                sendMsg("! Имя пользователя не может быть пустым");
+            } else if (newName.contains(" ")) {
+                sendMsg("! Имя пользователя не может содержать пробелы");
+            } else if (newName.startsWith("/")) {
+                sendMsg("! Имя пользователя не может начинаться с /");
+            } else if (newName.equals(username)) {
+                sendMsg("! Вы уже используете это имя пользователя");
+            } else if (server.findClientByUsername(newName) != null) {
+                sendMsg("! Имя пользователя " + newName + " уже занято");
             } else {
-                String oldNick = username;
-                setUsername(newNick);
-                sendMsg("! Ваш ник изменён. Новый ник: " + getUsername());
-                server.broadcastMessage(role.getPrefix() + oldNick + " теперь известен как " + role.getPrefix() + getUsername());
+                String oldName = username;
+                setUsername(newName);
+                sendMsg("* Имя пользователя изменено: " + getUsername());
+                server.broadcastMessage(role.getPrefix() + oldName + " теперь известен как " + role.getPrefix() + getUsername());
             }
         } else {
-            sendUsageMessage(AvailableCommands.NICK);
+            sendUsageMessage(AvailableCommands.NAME);
         }
     }
 
@@ -235,18 +226,20 @@ public class ClientHandler {
     private void handleWhisper(String message) {
         String[] parts = message.split("\\s+", 3);
         if (parts.length >= 3 && !parts[1].isEmpty()) {
-            String recipientNick = parts[1];
+            String recipientName = parts[1];
             String messageText = parts[2];
 
-            if (recipientNick.equals(username)) {
+            if (messageText.trim().isEmpty()) {
+                sendMsg("! Сообщение не может быть пустым");
+            } else if (recipientName.equals(username)) {
                 sendMsg("! Нельзя отправить ЛС самому себе");
             } else {
-                ClientHandler recipient = server.findClientByUsername(recipientNick);
+                ClientHandler recipient = server.findClientByUsername(recipientName);
                 if (recipient != null) {
                     recipient.sendMsg("> ЛС от " + username + ": " + messageText);
-                    sendMsg("* Сообщение отправлено пользователю " + recipientNick);
+                    sendMsg("* Сообщение отправлено пользователю " + recipientName);
                 } else {
-                    sendMsg("! Пользователь " + recipientNick + " не найден");
+                    sendMsg("! Пользователь с именем " + recipientName + " не найден");
                 }
             }
         } else {
@@ -267,19 +260,19 @@ public class ClientHandler {
 
         String[] parts = message.split("\\s+", 2);
         if (parts.length >= 2 && !parts[1].isEmpty()) {
-            String targetNick = parts[1];
+            String targetName = parts[1];
 
-            if (targetNick.equals(username)) {
+            if (targetName.equals(username)) {
                 sendMsg("! Вы уже администратор");
             } else {
-                ClientHandler target = server.findClientByUsername(targetNick);
+                ClientHandler target = server.findClientByUsername(targetName);
                 if (target == null) {
-                    sendMsg("! Пользователь с ником " + targetNick + " не найден");
+                    sendMsg("! Пользователь с именем " + targetName + " не найден");
                 } else if (target.getRole() == AvailableRoles.ADMIN || target.getRole() == AvailableRoles.OWNER) {
-                    sendMsg("! " + targetNick + " уже имеет права администратора");
+                    sendMsg("! " + targetName + " уже имеет права администратора");
                 } else {
                     target.promoteToAdmin();
-                    server.broadcastMessage("> " + target.getRole().getPrefix() + targetNick + " теперь " + target.getRole().getDescription());
+                    server.broadcastMessage("> " + target.getRole().getPrefix() + targetName + " теперь " + target.getRole().getDescription());
                 }
             }
         } else {
@@ -300,21 +293,21 @@ public class ClientHandler {
 
         String[] parts = message.split("\\s+", 2);
         if (parts.length >= 2 && !parts[1].isEmpty()) {
-            String targetNick = parts[1];
+            String targetName = parts[1];
 
-            if (targetNick.equals(username)) {
+            if (targetName.equals(username)) {
                 sendMsg("! Нельзя снять права у самого себя");
             } else {
-                ClientHandler target = server.findClientByUsername(targetNick);
+                ClientHandler target = server.findClientByUsername(targetName);
                 if (target == null) {
-                    sendMsg("! Пользователь с ником " + targetNick + " не найден");
+                    sendMsg("! Пользователь с именем пользователя " + targetName + " не найден");
                 } else if (target.getRole() == AvailableRoles.OWNER) {
                     sendMsg("! Нельзя снять права у владельца");
                 } else if (target.getRole() == AvailableRoles.USER) {
-                    sendMsg("! " + targetNick + " не является администратором");
+                    sendMsg("! " + targetName + " не является администратором");
                 } else {
                     target.demoteToUser();
-                    server.broadcastMessage("> " + targetNick + " больше не администратор");
+                    server.broadcastMessage("> " + targetName + " больше не администратор");
                 }
             }
         } else {
@@ -335,20 +328,20 @@ public class ClientHandler {
 
         String[] parts = message.split("\\s+", 2);
         if (parts.length >= 2 && !parts[1].isEmpty()) {
-            String targetNick = parts[1];
+            String targetName = parts[1];
 
-            if (targetNick.equals(username)) {
+            if (targetName.equals(username)) {
                 sendMsg("! Нельзя выгнать самого себя");
             } else {
-                ClientHandler target = server.findClientByUsername(targetNick);
+                ClientHandler target = server.findClientByUsername(targetName);
                 if (target == null) {
-                    sendMsg("! Пользователь с ником " + targetNick + " не найден");
+                    sendMsg("! Пользователь с именем пользователя " + targetName + " не найден");
                 } else if (target.getRole() == AvailableRoles.OWNER) {
                     sendMsg("! Нельзя выгнать владельца");
                 } else {
                     target.sendMsg("! Вы были отключены администратором " + role.getPrefix() + username);
                     target.disconnect();
-                    server.broadcastMessage("> " + role.getPrefix() + username + " отключил " + target.getRole().getPrefix() + targetNick);
+                    server.broadcastMessage("> " + role.getPrefix() + username + " отключил " + target.getRole().getPrefix() + targetName);
                 }
             }
         } else {
@@ -366,7 +359,7 @@ public class ClientHandler {
     }
 
     /**
-     * Обрабатываем команду отправки сообщения от имени сервера.
+     * Обрабатывает команду отправки сообщения от имени сервера.
      *
      * @param message сообщение с командой
      */
@@ -389,7 +382,7 @@ public class ClientHandler {
      */
     private void disconnect() {
         server.unsubscribe(this);
-        logger.log(System.Logger.Level.INFO, "Client disconnected port: " + socket.getPort());
+        logger.log(System.Logger.Level.INFO, "Клиент отключён, порт: " + socket.getPort());
         closeResource(in, "DataInputStream");
         closeResource(out, "DataOutputStream");
         closeResource(socket, "Socket");

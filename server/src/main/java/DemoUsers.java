@@ -6,30 +6,30 @@ public enum DemoUsers {
     BOB("bob", "123", "Bob"),
     TOM("tom", "456", "Tom");
 
-    private final String login;
+    private final String nickname;
     private final String password;
     private final String username;
 
     /**
      * Создаёт демонстрационного пользователя.
      *
-     * @param login    логин пользователя
+     * @param nickname    ник пользователя
      * @param password пароль пользователя
      * @param username отображаемое имя пользователя
      */
-    DemoUsers(String login, String password, String username) {
-        this.login = login;
+    DemoUsers(String nickname, String password, String username) {
+        this.nickname = nickname;
         this.password = password;
         this.username = username;
     }
 
     /**
-     * Возвращает логин пользователя.
+     * Возвращает ник пользователя.
      *
-     * @return логин
+     * @return ник
      */
-    public String getLogin() {
-        return login;
+    public String getNickname() {
+        return nickname;
     }
 
     /**
