@@ -10,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Server {
     private final int port;
     private final List<ClientHandler> clients;
+    private final AuthenticatedProvider authenticatedProvider;
 
     private static final System.Logger logger = System.getLogger(Server.class.getName());
 
@@ -21,6 +22,7 @@ public class Server {
     public Server(int port) {
         this.port = port;
         clients = new CopyOnWriteArrayList<>();
+        this.authenticatedProvider = new InMemoryAuthenticatedProvider(this);
     }
 
     /**
@@ -28,11 +30,12 @@ public class Server {
      */
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            logger.log(System.Logger.Level.INFO, "Server started. port: " + port);
+            logger.log(System.Logger.Level.INFO, "Сервер запущен, порт: " + port);
+            authenticatedProvider.initialize();
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                subscribe(new ClientHandler(this, socket));
+                new ClientHandler(this, socket);
             }
 
         } catch (IOException e) {
@@ -46,7 +49,7 @@ public class Server {
      * @param clientHandler обработчик клиента
      */
     public void subscribe(ClientHandler clientHandler) {
-        broadcastMessage("> Подключился пользователь: " + clientHandler.getUsername());
+        broadcastMessage("> Подключился пользователь: " + clientHandler.getRole().getPrefix() + clientHandler.getUsername() + " (" + clientHandler.getRole() + ")");
         clients.add(clientHandler);
     }
 
@@ -56,8 +59,9 @@ public class Server {
      * @param clientHandler обработчик клиента
      */
     public void unsubscribe(ClientHandler clientHandler) {
-        broadcastMessage("> Пользователь " + clientHandler.getUsername() + " покинул чат");
-        clients.remove(clientHandler);
+        if (clients.remove(clientHandler)) {
+            broadcastMessage("> Пользователь " + clientHandler.getUsername() + " покинул чат");
+        }
     }
 
     /**
@@ -72,7 +76,32 @@ public class Server {
     }
 
     /**
-     * Возвращает количество и имена подключенных клиентов.
+     * Возвращает количество подключенных участников.
+     *
+     * @return количество подключенных участников
+     */
+    public int getClientsCount() {
+        return clients.size();
+    }
+
+    /**
+     * Проверяет, занято ли имя пользователя среди подключенных клиентов.
+     *
+     * @param username имя пользователя для проверки
+     * @return true если имя занято, false если свободно
+     */
+    public boolean isUsernameBusy(String username) {
+        for (ClientHandler c : clients) {
+            if (c.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Возвращает количество и имена подключенных клиентов с префиксами ролей.
      *
      * @return количество и имена подключенных клиентов
      */
@@ -87,7 +116,7 @@ public class Server {
             if (i > 0) {
                 sb.append(", ");
             }
-            sb.append(clients.get(i).getUsername());
+            sb.append(clients.get(i).getRole().getPrefix()).append(clients.get(i).getUsername());
         }
         return sb.toString();
     }
@@ -95,8 +124,8 @@ public class Server {
     /**
      * Ищет пользователя в списке подключенных клиентов.
      *
-     * @param username ник пользователя для поиска в списке клиентов сервера
-     * @return объект пользователя сервера
+     * @param username имя пользователя для поиска
+     * @return ClientHandler пользователя или null, если не найден
      */
     public ClientHandler findClientByUsername(String username) {
         for (ClientHandler c : clients) {
@@ -107,5 +136,13 @@ public class Server {
         return null;
     }
 
+    /**
+     * Возвращает провайдер аутентификации.
+     *
+     * @return провайдер аутентификации
+     */
+    public AuthenticatedProvider getAuthenticatedProvider() {
+        return authenticatedProvider;
+    }
 
 }

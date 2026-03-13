@@ -2,9 +2,16 @@
  * Перечисление доступных команд чата.
  */
 public enum AvailableCommands {
+    AUTH("/auth", "/auth <nickname> <password>", "аутентификация (только при входе)"),
+    REG("/reg", "/reg <nickname> <password> <username>", "регистрация (только при входе)"),
     HELP("/help", "/help", "отображает доступные команды"),
-    NICK("/nick", "/nick <новый_ник>", "смена ника"),
-    WHISPER("/w", "/w <ник> <сообщение>", "отправка ЛС"),
+    INFO("/info", "/info", "отображает информацию о пользователе"),
+    NAME("/name", "/name <новое_имя_пользователя>", "смена имени пользователя"),
+    WHISPER("/w", "/w <имя_пользователя> <сообщение>", "отправка ЛС"),
+    ALL("/all", "/all <сообщение>", "отправка от имени сервера (доступно для ролей OWNER, ADMIN)"),
+    KICK("/kick", "/kick <имя_пользователя>", "отключить пользователя (доступно для ролей OWNER, ADMIN)"),
+    OP("/op", "/op <имя_пользователя>", "выдать права администратора (доступно для ролей OWNER, ADMIN)"),
+    DEOP("/deop", "/deop <имя_пользователя>", "забрать права администратора (доступно для ролей OWNER)"),
     EXIT("/exit", "/exit", "выход из чата");
 
     private final String command;
@@ -22,15 +29,6 @@ public enum AvailableCommands {
         this.command = command;
         this.usage = usage;
         this.description = description;
-    }
-
-    /**
-     * Возвращает команду.
-     *
-     * @return команда
-     */
-    public String getCommand() {
-        return command;
     }
 
     /**
