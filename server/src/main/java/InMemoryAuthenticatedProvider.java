@@ -4,6 +4,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Провайдер аутентификации с хранением данных в памяти.
  */
+@Deprecated
 public class InMemoryAuthenticatedProvider implements AuthenticatedProvider {
     /**
      * Внутренний класс для представления пользователя.

@@ -22,7 +22,7 @@ public class Server {
     public Server(int port) {
         this.port = port;
         clients = new CopyOnWriteArrayList<>();
-        this.authenticatedProvider = new InMemoryAuthenticatedProvider(this);
+        this.authenticatedProvider = new PostgresqlAuthProvider(this);
     }
 
     /**
@@ -49,7 +49,7 @@ public class Server {
      * @param clientHandler обработчик клиента
      */
     public void subscribe(ClientHandler clientHandler) {
-        broadcastMessage("> Подключился пользователь: " + clientHandler.getRole().getPrefix() + clientHandler.getUsername() + " (" + clientHandler.getRole() + ")");
+        broadcastMessage("> " + clientHandler.getRole().getPrefix() + clientHandler.getUsername() + " присоединился к чату");
         clients.add(clientHandler);
     }
 
@@ -60,7 +60,7 @@ public class Server {
      */
     public void unsubscribe(ClientHandler clientHandler) {
         if (clients.remove(clientHandler)) {
-            broadcastMessage("> Пользователь " + clientHandler.getUsername() + " покинул чат");
+            broadcastMessage("> " + clientHandler.getRole().getPrefix() + clientHandler.getUsername() + " покинул чат");
         }
     }
 
