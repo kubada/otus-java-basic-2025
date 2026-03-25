@@ -1,6 +1,7 @@
 /**
  * Предустановленные демонстрационные пользователи для тестирования.
  */
+@Deprecated
 public enum DemoUsers {
     ADMIN("admin", "admin", "Administrator"),
     BOB("bob", "123", "Bob"),

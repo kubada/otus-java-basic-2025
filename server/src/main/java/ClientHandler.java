@@ -12,6 +12,7 @@ public class ClientHandler {
     private final DataInputStream in;
     private final DataOutputStream out;
 
+    private String nickname;
     private String username;
     private AvailableRoles role;
 
@@ -163,6 +164,24 @@ public class ClientHandler {
     }
 
     /**
+     * Возвращает ник пользователя (для входа).
+     *
+     * @return ник пользователя
+     */
+    public String getNickname() {
+        return nickname;
+    }
+
+    /**
+     * Устанавливает ник пользователя (для входа).
+     *
+     * @param nickname ник
+     */
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    /**
      * Устанавливает роль пользователя.
      *
      * @param role новая роль
@@ -175,16 +194,36 @@ public class ClientHandler {
      * Повышает пользователя до администратора.
      */
     public void promoteToAdmin() {
-        this.role = AvailableRoles.ADMIN;
-        sendMsg("! Вы получили права администратора");
+        boolean dbUpdated = false;
+        if (server.getAuthenticatedProvider() instanceof PostgresqlAuthProvider postgresProvider) {
+            dbUpdated = postgresProvider.updateUserRole(this.nickname, AvailableRoles.ADMIN);
+        }
+
+        if (dbUpdated || !(server.getAuthenticatedProvider() instanceof PostgresqlAuthProvider)) {
+            this.role = AvailableRoles.ADMIN;
+            sendMsg("! Вы получили права администратора");
+        } else {
+            sendMsg("! Ошибка сохранения роли в БД");
+            logger.log(System.Logger.Level.ERROR, "Не удалось обновить роль для " + username);
+        }
     }
 
     /**
      * Понижает администратора до обычного пользователя.
      */
     public void demoteToUser() {
-        this.role = AvailableRoles.USER;
-        sendMsg("! Ваши права администратора сняты");
+        boolean dbUpdated = false;
+        if (server.getAuthenticatedProvider() instanceof PostgresqlAuthProvider postgresProvider) {
+            dbUpdated = postgresProvider.updateUserRole(this.nickname, AvailableRoles.USER);
+        }
+
+        if (dbUpdated || !(server.getAuthenticatedProvider() instanceof PostgresqlAuthProvider)) {
+            this.role = AvailableRoles.USER;
+            sendMsg("! Ваши права администратора сняты");
+        } else {
+            sendMsg("! Ошибка сохранения роли в БД");
+            logger.log(System.Logger.Level.ERROR, "Не удалось обновить роль для " + username);
+        }
     }
 
     /**
@@ -209,9 +248,20 @@ public class ClientHandler {
                 sendMsg("! Имя пользователя " + newName + " уже занято");
             } else {
                 String oldName = username;
-                setUsername(newName);
-                sendMsg("* Имя пользователя изменено: " + getUsername());
-                server.broadcastMessage(role.getPrefix() + oldName + " теперь известен как " + role.getPrefix() + getUsername());
+
+                boolean dbUpdated = false;
+                if (server.getAuthenticatedProvider() instanceof PostgresqlAuthProvider postgresProvider) {
+                    dbUpdated = postgresProvider.updateUsername(this.nickname, newName);
+                }
+
+                if (dbUpdated || !(server.getAuthenticatedProvider() instanceof PostgresqlAuthProvider)) {
+                    setUsername(newName);
+                    sendMsg("* Имя пользователя изменено: " + getUsername());
+                    server.broadcastMessage(role.getPrefix() + oldName + " теперь известен как " + role.getPrefix() + getUsername());
+                } else {
+                    sendMsg("! Ошибка сохранения имени в БД");
+                    logger.log(System.Logger.Level.ERROR, "Не удалось обновить имя для " + oldName);
+                }
             }
         } else {
             sendUsageMessage(AvailableCommands.NAME);
@@ -307,7 +357,7 @@ public class ClientHandler {
                     sendMsg("! " + targetName + " не является администратором");
                 } else {
                     target.demoteToUser();
-                    server.broadcastMessage("> " + targetName + " больше не администратор");
+                    server.broadcastMessage("> " + target.getRole().getPrefix() + targetName + " больше не администратор");
                 }
             }
         } else {
