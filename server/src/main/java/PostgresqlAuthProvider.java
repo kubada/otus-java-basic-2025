@@ -124,7 +124,15 @@ public class PostgresqlAuthProvider implements AuthenticatedProvider {
                     String passwordHash = rs.getString("password_hash");
                     String roleName = rs.getString("role_name");
 
-                    AvailableRoles role = AvailableRoles.valueOf(roleName);
+                    // Преобразуем имя роли из БД в enum, с fallback на USER
+                    AvailableRoles role;
+                    try {
+                        role = AvailableRoles.valueOf(roleName);
+                    } catch (IllegalArgumentException e) {
+                        logger.log(System.Logger.Level.WARNING,
+                                "Неизвестная роль '" + roleName + "' для пользователя " + dbNickname + ", используется USER по умолчанию");
+                        role = AvailableRoles.USER;
+                    }
 
                     return new User(id, dbNickname, dbUsername, passwordHash, role);
                 }

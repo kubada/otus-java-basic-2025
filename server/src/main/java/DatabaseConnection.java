@@ -6,9 +6,14 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 
 
+/**
+ * Утилитарный класс для управления подключением к PostgreSQL.
+ * Connection в PostgreSQL JDBC является потокобезопасным для создания Statement/PreparedStatement.
+ * Однако сами Statement/PreparedStatement не должны использоваться одновременно из разных потоков.
+ * В данной реализации каждый запрос создаёт свой PreparedStatement, что обеспечивает потокобезопасность.
+ */
 public class DatabaseConnection {
     private static Connection connection;
-    private static Statement stmt;
 
     private static final System.Logger logger = System.getLogger(DatabaseConnection.class.getName());
 
@@ -44,7 +49,6 @@ public class DatabaseConnection {
         try {
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(databaseUrl, databaseUser, databasePassword);
-            stmt = connection.createStatement();
             logger.log(System.Logger.Level.INFO, "Подключение к БД успешно установлено");
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException("Не удалось подключиться к БД", e);
@@ -52,13 +56,6 @@ public class DatabaseConnection {
     }
 
     private static void disconnect() {
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (SQLException e) {
-                logger.log(System.Logger.Level.WARNING, "Ошибка закрытия Statement", e);
-            }
-        }
         if (connection != null) {
             try {
                 connection.close();
