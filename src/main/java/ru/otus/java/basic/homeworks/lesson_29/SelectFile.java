@@ -24,7 +24,7 @@ public class SelectFile {
                 continue;
             }
 
-            File file = new File("files/" + input);
+            File file = new File("files", input);
 
             if (file.exists() && file.isFile()) {
                 System.out.println("Файл найден: " + file.getName());

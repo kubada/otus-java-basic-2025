@@ -9,8 +9,17 @@ public class Application {
 
         File selectedFile = SelectFile.selectFile(scanner);
 
-        System.out.print("Введите искомую последовательность символов: ");
-        String searchString = scanner.nextLine();
+        String searchString;
+        while (true) {
+            System.out.print("Введите искомую последовательность символов: ");
+            searchString = scanner.nextLine();
+
+            if (searchString.isEmpty()) {
+                System.out.println("Поиск пустой строки невозможен. Попробуйте снова.");
+            } else {
+                break;
+            }
+        }
 
         int count = SearchInFile.search(selectedFile.getPath(), searchString);
 
