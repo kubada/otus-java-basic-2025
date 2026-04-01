@@ -2,13 +2,14 @@ package ru.otus.java.basic.homeworks.lesson_30;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Создаёт три задачи, каждая из которых печатает свой символ 5 раз.
  * Синхронизация через PrintManager, выводит строго "ABCABCABCABCABC".
  */
 public class Application {
-    static void main() {
+    static void main() throws InterruptedException {
         PrintManager manager = new PrintManager();
 
         ExecutorService service = Executors.newFixedThreadPool(3);
@@ -44,5 +45,8 @@ public class Application {
         });
 
         service.shutdown();
+        if (!service.awaitTermination(1, TimeUnit.MINUTES)) {
+            System.err.println("Не все задачи завершились за отведённое время");
+        }
     }
 }
