@@ -13,9 +13,17 @@ public class Application {
         int[] result1 = getElementsAfterLastOne(array1);
         logger.info("Ввод: " + Arrays.toString(array1) + " => Результат: " + Arrays.toString(result1));
 
-        int[] array2 = {1, 2, 2, 1};
-        boolean result2 = containsOnlyOneAndTwo(array2);
-        logger.info("Ввод: " + Arrays.toString(array2) + " => Результат: " + result2);
+        try {
+            int[] array2 = {2, 2, 2, 2};
+            int[] result2 = getElementsAfterLastOne(array2);
+            logger.info("Ввод: " + Arrays.toString(array2) + " => Результат: " + Arrays.toString(result2));
+        } catch (RuntimeException e) {
+            logger.severe("Ввод: [2, 2, 2, 2] => RuntimeException: " + e.getMessage());
+        }
+
+        int[] array3 = {1, 2, 2, 1};
+        boolean result3 = containsOnlyOneAndTwo(array3);
+        logger.info("Ввод: " + Arrays.toString(array3) + " => Результат: " + result3);
     }
 
     /**
