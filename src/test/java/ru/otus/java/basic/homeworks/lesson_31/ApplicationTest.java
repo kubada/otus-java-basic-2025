@@ -137,4 +137,16 @@ class ApplicationTest {
         assertFalse(result);
         logger.info("Тест пройден");
     }
+
+    @Test
+    @DisplayName("Должен вернуть false для пустого массива")
+    void shouldReturnFalseForEmptyArray() {
+        logger.info("Тест: должен вернуть false для пустого массива");
+
+        int[] input = {};
+        boolean result = Application.containsOnlyOneAndTwo(input);
+
+        assertFalse(result);
+        logger.info("Тест пройден");
+    }
 }

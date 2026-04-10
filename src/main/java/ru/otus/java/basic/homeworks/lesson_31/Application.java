@@ -37,9 +37,10 @@ public class Application {
         logger.info("getElementsAfterLastOne вызывается с массивом: " + Arrays.toString(array));
 
         int lastOneIndex = -1;
-        for (int i = 0; i < array.length; i++) {
+        for (int i = array.length - 1; i >= 0; i--) {
             if (array[i] == 1) {
                 lastOneIndex = i;
+                break;
             }
         }
 
@@ -48,12 +49,7 @@ public class Application {
             throw new RuntimeException("Массив не содержит '1'");
         }
 
-        int resultLength = array.length - lastOneIndex - 1;
-        int[] result = new int[resultLength];
-
-        for (int i = 0; i < resultLength; i++) {
-            result[i] = array[lastOneIndex + 1 + i];
-        }
+        int[] result = Arrays.copyOfRange(array, lastOneIndex + 1, array.length);
 
         logger.info("Возвращаемый массив: " + Arrays.toString(result));
         return result;
