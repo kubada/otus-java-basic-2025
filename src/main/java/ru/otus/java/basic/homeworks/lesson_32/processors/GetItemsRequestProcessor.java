@@ -17,6 +17,8 @@ import java.util.List;
  * с HTTP-статусом 200 OK.
  */
 public class GetItemsRequestProcessor implements RequestProcessor {
+    private static final Gson GSON = new Gson();
+
     /**
      * Обрабатывает HTTP-запрос на получение списка элементов.
      * Возвращает JSON-массив с тремя предопределенными элементами.
@@ -32,8 +34,7 @@ public class GetItemsRequestProcessor implements RequestProcessor {
                 new Item(2L, "Milk", 150),
                 new Item(3L, "Cheese", 400)
         ));
-        Gson gson = new Gson();
-        String result = gson.toJson(items);
+        String result = GSON.toJson(items);
         String response = "HTTP/1.1 200 OK\r\n" +
                 "Content-Type: application/json\r\n" +
                 "\r\n" + result;

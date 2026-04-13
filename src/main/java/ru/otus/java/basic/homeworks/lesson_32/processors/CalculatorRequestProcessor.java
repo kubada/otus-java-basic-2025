@@ -23,13 +23,31 @@ public class CalculatorRequestProcessor implements RequestProcessor {
      */
     @Override
     public void execute(HttpRequest request, OutputStream output) throws IOException {
-        int a = Integer.parseInt(request.getParameter("a"));
-        int b = Integer.parseInt(request.getParameter("b"));
-        String result = a + " + " + b + " = " + (a + b);
-        String response = "HTTP/1.1 200 OK\r\n" +
-                "Content-Type: text/html\r\n" +
-                "\r\n" +
-                "<html><body><h1>" + result + "</h1></body></html>";
+        String response;
+        try {
+            String paramA = request.getParameter("a");
+            String paramB = request.getParameter("b");
+
+            if (paramA == null || paramB == null) {
+                response = "HTTP/1.1 400 Bad Request\r\n" +
+                        "Content-Type: text/html\r\n" +
+                        "\r\n" +
+                        "<html><body><h1>Ошибка: параметры 'a' и 'b' обязательны</h1></body></html>";
+            } else {
+                int a = Integer.parseInt(paramA);
+                int b = Integer.parseInt(paramB);
+                String result = a + " + " + b + " = " + (a + b);
+                response = "HTTP/1.1 200 OK\r\n" +
+                        "Content-Type: text/html\r\n" +
+                        "\r\n" +
+                        "<html><body><h1>" + result + "</h1></body></html>";
+            }
+        } catch (NumberFormatException e) {
+            response = "HTTP/1.1 400 Bad Request\r\n" +
+                    "Content-Type: text/html\r\n" +
+                    "\r\n" +
+                    "<html><body><h1>Ошибка: параметры 'a' и 'b' должны быть числами</h1></body></html>";
+        }
         output.write(response.getBytes(StandardCharsets.UTF_8));
     }
 }

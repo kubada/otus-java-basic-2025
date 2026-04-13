@@ -16,6 +16,8 @@ import java.util.logging.Logger;
  */
 public class CreateItemRequestProcessor implements RequestProcessor {
     private static final Logger logger = Logger.getLogger(CreateItemRequestProcessor.class.getName());
+    private static final Gson GSON = new Gson();
+
     /**
      * Обрабатывает HTTP-запрос на создание элемента.
      * Извлекает JSON из тела запроса, преобразует в объект Item и возвращает статус 201.
@@ -26,8 +28,7 @@ public class CreateItemRequestProcessor implements RequestProcessor {
      */
     @Override
     public void execute(HttpRequest request, OutputStream output) throws IOException {
-        Gson gson = new Gson();
-        Item item = gson.fromJson(request.getBody(), Item.class);
+        Item item = GSON.fromJson(request.getBody(), Item.class);
         logger.info("Создан элемент: " + item);
         String response = """
                 HTTP/1.1 201 Created\r

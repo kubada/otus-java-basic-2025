@@ -1,8 +1,11 @@
 package ru.otus.java.basic.homeworks.lesson_32;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 /**
@@ -37,14 +40,33 @@ public class HttpServer {
             while (true) {
                 Socket socket = serverSocket.accept();
                 new Thread(() -> {
-                    try {
+                    try (BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
                         logger.info("Обработка запроса в потоке: " + Thread.currentThread().getName());
-                        byte[] buffer = new byte[8192];
-                        int n = socket.getInputStream().read(buffer);
-                        if (n < 1) {
-                            return;
+
+                        StringBuilder requestBuilder = new StringBuilder();
+                        String line;
+                        int contentLength = 0;
+
+                        // Читаем заголовки
+                        while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                            requestBuilder.append(line).append("\r\n");
+                            if (line.startsWith("Content-Length: ")) {
+                                contentLength = Integer.parseInt(line.substring(16));
+                            }
                         }
-                        String rawRequest = new String(buffer, 0, n);
+                        requestBuilder.append("\r\n");
+
+                        // Читаем тело запроса, если есть
+                        if (contentLength > 0) {
+                            char[] body = new char[contentLength];
+                            int bytesRead = reader.read(body, 0, contentLength);
+                            if (bytesRead > 0) {
+                                requestBuilder.append(body, 0, bytesRead);
+                            }
+                        }
+
+                        String rawRequest = requestBuilder.toString();
                         HttpRequest request = new HttpRequest(rawRequest);
                         request.info(true);
                         dispatcher.execute(request, socket.getOutputStream());
